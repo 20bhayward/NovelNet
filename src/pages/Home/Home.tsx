@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import NovelList from '../../components/Novel/NovelList';
 
 const Home: React.FC = () => {
   const [popularNovels, setPopularNovels] = useState([]);
@@ -28,7 +29,8 @@ const Home: React.FC = () => {
           <h1 className="text-center mb-4">Welcome to Lore Library</h1>
           <p className="text-center mb-5">Explore the most popular novels on our platform.</p>
           <Row>
-            {popularNovels.map((novel:any) => (
+            <NovelList/>
+            {/* {popularNovels.map((novel:any) => (
               <Col md={4} key={novel.id}>
                 <Card className="mb-4">
                   <Card.Body>
@@ -38,7 +40,7 @@ const Home: React.FC = () => {
                   </Card.Body>
                 </Card>
               </Col>
-            ))}
+            ))} */}
           </Row>
         </Col>
       </Row>

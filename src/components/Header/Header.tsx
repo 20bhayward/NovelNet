@@ -1,53 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Navbar, Nav, Form, FormControl, Container } from 'react-bootstrap';
+import React from 'react';
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import './Header.css';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import SearchBar from '../SearchBar/SearchBar';
 
 const Header: React.FC = () => {
   const isLoggedIn = false; // Replace with your actual authentication logic
-  const [searchExpanded, setSearchExpanded] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  const searchFormRef = useRef<HTMLDivElement>(null);
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-    }
+  const handleAdvancedSearch = () => {
+    navigate('/search');
   };
-
-  const handleSearchIconClick = () => {
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-    } else {
-      toggleSearchExpanded();
-    }
-  };
-
-  const toggleSearchExpanded = () => {
-    setSearchExpanded(!searchExpanded);
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (searchFormRef.current && !searchFormRef.current.contains(event.target as Node)) {
-      setSearchExpanded(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
       <Container className="d-flex align-items-center">
-        <Navbar.Brand as={Link} to="/" onClick={toggleSearchExpanded} className="d-flex align-items-center">
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
           Lore Library
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -59,26 +28,11 @@ const Header: React.FC = () => {
             <Nav.Link as={Link} to="/bookmarks">
               Bookmarks
             </Nav.Link>
+            <Button variant="outline-light" onClick={handleAdvancedSearch} className="ml-2">
+              Advanced Search
+            </Button>
           </Nav>
-          <div ref={searchFormRef} className={`search-form ${searchExpanded ? 'expanded' : ''}`}>
-            <Form inline onSubmit={handleSearch} className="d-flex align-items-center">
-              <div className="search-input-container d-flex align-items-center">
-                <FontAwesomeIcon
-                  icon={faSearch}
-                  className={`search-icon ${searchExpanded ? 'expanded' : ''}`}
-                  onClick={handleSearchIconClick}
-                />
-                <FormControl
-                  type="text"
-                  placeholder="Search"
-                  className={`search-input ${searchExpanded ? 'expanded' : ''}`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onClick={toggleSearchExpanded}
-                />
-              </div>
-            </Form>
-          </div>
+          <SearchBar />
           <Nav>
             {isLoggedIn ? (
               <>

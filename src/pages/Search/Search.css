@@ -1,0 +1,126 @@
+/* Search.css */
+.search-card {
+    height: 500px;
+    margin-bottom: 1rem;
+  }
+  
+  .search-card-image-container {
+    position: relative;
+    height: 300px;
+    cursor: pointer;
+  }
+  
+  .search-card-image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+  
+  .search-card-title-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .search-card-title-panel:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .search-card-info {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .search-card-score {
+    margin-right: 1rem;
+  }
+  
+  .score-circle {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .score-circle.black {
+    background-color: #333;
+  }
+  
+  .score-circle.red {
+    background-color: #dc3545;
+  }
+  
+  .score-circle.orange {
+    background-color: #fd7e14;
+  }
+  
+  .score-circle.yellow {
+    background-color: #ffc107;
+  }
+  
+  .score-circle.green {
+    background-color: #28a745;
+  }
+  
+  .score-circle.gold {
+    background-color: #ffd700;
+  }
+  
+  .search-card-details {
+    flex: 1;
+  }
+  
+  .search-card-description {
+    margin-bottom: 0.5rem;
+  }
+  
+  .search-card-genres {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .expanded-image-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .expanded-image-container {
+    position: relative;
+  }
+  
+  .expanded-image {
+    max-height: 80vh;
+    max-width: 100%;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
