@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from '../services/api';
 import api from '../services/api';
 
 interface AuthContextType {
@@ -11,15 +10,14 @@ interface AuthContextType {
   register: (user: any, token: string) => void;
 }
 
-export const AuthContext = createContext<AuthContextType>(
-  {
-    isAuthenticated: false,
-    user: null,
-    isAdmin: false,
-    login: () => { },
-    logout: () => { },
-    register: () => { },
-  });
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  user: null,
+  isAdmin: false,
+  login: () => {},
+  logout: () => {},
+  register: () => {},
+});
 
 interface User {
   userId: string;
@@ -46,7 +44,12 @@ export const AuthProvider: React.FC = ({ children }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('/api/users/profile');
+        const token = localStorage.getItem('token');
+        const response = await api.get('/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.data) {
           setUser(response.data);
           setIsAuthenticated(true);
@@ -60,25 +63,6 @@ export const AuthProvider: React.FC = ({ children }) => {
         setUser(null);
       }
     };
-    // const fetchReviewData = async () => {
-    //   try {
-    //     const response = await axios.get('/api/manga/:mangaId/reviews');
-    //     if (response.data) {
-    //       setReview(response.data);
-    //       setIsAuthenticated(true);
-    //     }
-    //     else {
-    //       setIsAuthenticated(false);
-    //       setReview(null);
-    //     }
-    //   }
-    //   catch (error) {
-    //     console.error('Error fetching user data:', error);
-    //     setIsAuthenticated(false);
-    //     setUser(null);
-    //   }
-    // };
-    // fetchReviewData();
     fetchUserData();
   }, []);
 
@@ -87,20 +71,26 @@ export const AuthProvider: React.FC = ({ children }) => {
     setUser(user);
     setIsAuthenticated(true);
   };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
     setIsAuthenticated(false);
-  }; const register = async (user: any) => {
+  };
+
+  const register = async (user: any) => {
     try {
       const response = await api.post('/api/auth/register', user);
-      // Redirect to the home screen 
+      // Redirect to the home screen
       window.location.href = '/';
-    }
-
-    catch (error) {
+    } catch (error) {
       console.error('Error during registration:', error);
     }
   };
-  return (<AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout, register }}> {children} </AuthContext.Provider>);
+
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout, register }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
