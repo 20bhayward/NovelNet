@@ -118,7 +118,7 @@ const MangaDetails: React.FC = () => {
     const { isAuthenticated, user } = useContext(AuthContext);
 
     const API_BASE_URL = 'https://consumet-api-z0sh.onrender.com/meta/anilist/';
-    const DB_BASE_URL = 'https://lorelibraryserver.onrender.com/api/';
+    const DB_BASE_URL = 'https://lore-library-server-62fd6c0714e1.herokuapp.com/api/';
 
     const genreColor: GenreColorMap = {
         'Action': '#e74c3c',

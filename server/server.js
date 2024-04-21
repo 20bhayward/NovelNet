@@ -19,7 +19,7 @@ const upload = multer({ dest: 'uploads/' });
 
 // Middleware
 app.use(express.json());
-const allowedOrigins = ['http://localhost:3000', 'https://main--lorelibrary.netlify.app', 'https://lorelibraryserver.onrender.com','https://consumet-api-z0sh.onrender.com', 'https://consumet-api-z0sh.onrender.com/meta/anilist/' ]; // Add your React app's origin(s) here
+const allowedOrigins = ['http://localhost:3000', 'https://main--lorelibrary.netlify.app', 'https://lore-library-server-62fd6c0714e1.herokuapp.com/','https://consumet-api-z0sh.onrender.com', 'https://consumet-api-z0sh.onrender.com/meta/anilist/' ]; 
 
 app.use(cors({
   origin: function(origin, callback) {
