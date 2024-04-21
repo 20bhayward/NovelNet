@@ -42,7 +42,7 @@ app.use(session({
 }));
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://20bhayward:LoreMaster@lorelibrarydata.tbi2ztc.mongodb.net/?retryWrites=true&w=majority&appName=LoreLibraryData', {
+mongoose.connect('mongodb+srv://20bhayward:LoreMaster@lorelibrarydata.tbi2ztc.mongodb.net/', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
