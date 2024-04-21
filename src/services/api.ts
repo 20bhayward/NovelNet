@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiBaseURL = 'http://localhost:5000';
+const apiBaseURL = 'https://lorelibraryserver.onrender.com';
 
 export default axios.create({
   baseURL: apiBaseURL,
