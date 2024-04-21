@@ -1,3 +1,8 @@
 import axios from 'axios';
 
-const apiBaseURL = 'https://consumet-api-z0sh.onrender.com'; // Replace with the actual URL of novel-api
+const apiBaseURL = 'http://localhost:5000';
+
+export default axios.create({
+  baseURL: apiBaseURL,
+  withCredentials: true,
+});

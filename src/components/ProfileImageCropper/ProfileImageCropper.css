@@ -1,0 +1,14 @@
+.chakra-modal__content {
+    max-width: 600px;
+}
+
+.chakra-modal__body {
+    position: relative;
+    width: 100%;
+    height: 400px;
+}
+
+.chakra-modal__body .reactEasyCrop_Container {
+    width: 100%;
+    height: 100%;
+}

@@ -26,7 +26,12 @@ const SearchBar: React.FC = () => {
 
   return (
     <div className="search-bar">
-      <div className="search-input-container d-flex align-items-center">
+      <div className="search-input-container">
+        <FontAwesomeIcon
+          icon={faSearch}
+          className="search-icon"
+          onClick={handleSearch}
+        />
         <input
           type="text"
           placeholder="Search"
@@ -34,11 +39,6 @@ const SearchBar: React.FC = () => {
           value={searchTerm}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-        />
-        <FontAwesomeIcon
-          icon={faSearch}
-          className="search-icon"
-          onClick={handleSearch}
         />
       </div>
     </div>

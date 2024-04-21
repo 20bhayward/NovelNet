@@ -4,7 +4,7 @@ import Header from '../Header/Header';
 
 const Layout: React.FC = () => {
   return (
-    <div>
+    <div className="layout-container">
       <Header />
       <main>
         <Outlet />

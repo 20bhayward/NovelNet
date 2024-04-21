@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import Manga from '../models/Manga.js';
 import Comment from '../models/Comment.js';
+import mongoose from 'mongoose';
 
 const profilePicturesDir = path.join(path.resolve(), 'uploads', 'profile-pictures');
 
@@ -58,7 +59,7 @@ export const changePassword = async (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-  const userId = req._id;
+  const userId = req.userId;
   const { firstName, lastName, gender, location } = req.body;
   const username = req.body.username || '';
 
@@ -99,24 +100,21 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 
-};
+}; 
 export const followManga = async (req, res) => {
   try {
     const userId = req.params.userId;
     const mangaId = req.params.mangaId;
 
-    const user = await User.findOne(userId);
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const manga = await Manga.findOne({ id: mangaId });
-    if (!manga) {
-      return res.status(404).json({ message: 'Manga not found' });
-    }
+    const mangaObjectId = new mongoose.Types.ObjectId(mangaId);
 
-    if (!user.followedManga.includes(manga._id)) {
-      user.followedManga.push(manga._id);
+    if (!user.followedManga.includes(mangaObjectId)) {
+      user.followedManga.push(mangaObjectId);
       await user.save();
     }
 
@@ -132,18 +130,15 @@ export const favoriteManga = async (req, res) => {
     const userId = req.params.userId;
     const mangaId = req.params.mangaId;
 
-    const user = await User.findOne(userId);
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const manga = await Manga.findOne({ id: mangaId });
-    if (!manga) {
-      return res.status(404).json({ message: 'Manga not found' });
-    }
+    const mangaObjectId = new mongoose.Types.ObjectId(mangaId);
 
-    if (!user.favoriteManga.includes(manga._id)) {
-      user.favoriteManga.push(manga._id);
+    if (!user.favoriteManga.includes(mangaObjectId)) {
+      user.favoriteManga.push(mangaObjectId);
       await user.save();
     }
 
@@ -159,18 +154,15 @@ export const readingManga = async (req, res) => {
     const userId = req.params.userId;
     const mangaId = req.params.mangaId;
 
-    const user = await User.findOne(userId);
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const manga = await Manga.findOne({ id: mangaId });
-    if (!manga) {
-      return res.status(404).json({ message: 'Manga not found' });
-    }
+    const mangaObjectId = new mongoose.Types.ObjectId(mangaId);
 
-    if (!user.readingManga.includes(manga._id)) {
-      user.readingManga.push(manga._id);
+    if (!user.readingManga.includes(mangaObjectId)) {
+      user.readingManga.push(mangaObjectId);
       await user.save();
     }
 
