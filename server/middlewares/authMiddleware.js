@@ -1,22 +1,35 @@
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    const sessionUser = req.session.currentUser;
-    if (!sessionUser) {
-      return res.status(401).json({ message: 'Unauthorized' });
+    // Get the token from the request headers
+    const token = req.headers.authorization?.split(' ')[1];
+    console.log('Received token:', token); // Add this logging statement
+
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication failed: No token provided' });
     }
 
-    const user = await User.findOne({ uniqueId: sessionUser.uniqueId });
+    // Verify the token
+    console.log('JWT_SECRET:', process.env.JWT_SECRET); // Add this logging statement
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('Decoded token:', decoded); // Add this logging statement
+
+    const userId = decoded.userId;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
     if (!user) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Authentication failed: User not found' });
     }
 
-    req.userId = user._id;
-    req.userRole = user.role;
+    // Add the user object and id to the request
+    req._id = user._id;
+    req.user = user;
     next();
   } catch (error) {
     console.error('Error in authMiddleware:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(401).json({ message: 'Authentication failed' });
   }
 };

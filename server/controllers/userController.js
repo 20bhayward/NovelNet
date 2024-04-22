@@ -5,18 +5,19 @@ import fs from 'fs';
 import Manga from '../models/Manga.js';
 import Comment from '../models/Comment.js';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 
 const profilePicturesDir = path.join(path.resolve(), 'uploads', 'profile-pictures');
 
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req._id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     res.json({
-      userId: user._id.toString(),
+      _id: user._id,
       username: user.username,
       role: user.role,
       profilePicture: user.profilePicture,
@@ -24,7 +25,6 @@ export const getUserProfile = async (req, res) => {
       lastName: user.lastName,
       gender: user.gender,
       location: user.location,
-      uniqueId: user.uniqueId,
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -34,7 +34,7 @@ export const getUserProfile = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  const userId = req.session.currentUser.userId;
+  const userId = req._id;
 
   try {
     const user = await User.findById(userId);
@@ -59,7 +59,7 @@ export const changePassword = async (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-  const userId = req.userId;
+  const userId = req._id;
   const { firstName, lastName, gender, location } = req.body;
   const username = req.body.username || '';
 
@@ -103,7 +103,7 @@ export const updateProfile = async (req, res) => {
 }; 
 export const followManga = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.params._id;
     const mangaId = req.params.mangaId;
 
     const user = await User.findById(userId);
@@ -127,7 +127,7 @@ export const followManga = async (req, res) => {
 
 export const favoriteManga = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.params._id;
     const mangaId = req.params.mangaId;
 
     const user = await User.findById(userId);
@@ -151,7 +151,7 @@ export const favoriteManga = async (req, res) => {
 
 export const readingManga = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.params._id;
     const mangaId = req.params.mangaId;
 
     const user = await User.findById(userId);
@@ -175,8 +175,8 @@ export const readingManga = async (req, res) => {
 
 export const getProfileComments = async (req, res) => {
   try {
-    const { uniqueId } = req.params;
-    const comments = await Comment.find({ profileId: uniqueId }).exec();
+    const { _id } = req.params;
+    const comments = await Comment.find({ profileId: _id }).exec();
     res.json(comments);
   } catch (error) {
     console.error('Error fetching profile comments:', error);
@@ -186,13 +186,13 @@ export const getProfileComments = async (req, res) => {
 
 export const submitProfileComment = async (req, res) => {
   try {
-    const { uniqueId } = req.params;
+    const { _id } = req.params;
     const { commenterUniqueId, commenterUsername, comment } = req.body;
     const newComment = new Comment({
       uniqueId: commenterUniqueId,
       username: commenterUsername,
       comment,
-      profileId: uniqueId,
+      profileId: _id.toString(),
     });
     const savedComment = await newComment.save();
     res.status(201).json(savedComment);
@@ -204,8 +204,8 @@ export const submitProfileComment = async (req, res) => {
 
 export const getUserManga = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await User.findById(userId).populate('followedManga favoriteManga readingManga');
+    const { _id } = req.params;
+    const user = await User.findById(_id).populate('followedManga favoriteManga readingManga');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

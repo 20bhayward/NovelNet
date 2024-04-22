@@ -1,6 +1,5 @@
-// Login.tsx
 import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { AuthContext } from '../../contexts/AuthContext';
 import { Box, Avatar, Grid, Divider, Heading, Text, Textarea, Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
@@ -10,17 +9,20 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { setIsAuthenticated, setUser } = useContext(AuthContext);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-  
     try {
       const response = await api.post('/api/auth/login', { username, password });
-      localStorage.setItem('token', response.data.token);
-      login(response.data.user, response.data.token);
+      const { token, user } = response.data;
+      // Store the token in local storage or an HTTP-only cookie
+      localStorage.setItem('token', token);
+      // Update the user state or context
+      setUser(user);
+      setIsAuthenticated(true);
       navigate('/profile');
-    } catch (error : any) {
+    } catch (error: any) {
       if (error.response) {
         setError(error.response.data.message);
       } else {

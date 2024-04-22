@@ -4,6 +4,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { Box, Button, FormControl, FormLabel, Input, Heading, Text, Avatar, VStack, useToast } from '@chakra-ui/react';
 import ProfilePictureCropper from '../../components/ProfileImageCropper/ProfileImageCropper';
+import { set } from 'mongoose';
 
 interface ProfileData {
   username: string;
@@ -15,7 +16,7 @@ interface ProfileData {
 }
 
 const Profile: React.FC = () => {
-  const { user, isAuthenticated, login } = useContext(AuthContext);
+  const { user, isAuthenticated, setUser } = useContext(AuthContext);
   const [profile, setProfile] = useState<ProfileData>({
     username: '',
     profilePicture: '',
@@ -33,6 +34,7 @@ const Profile: React.FC = () => {
     const fetchProfile = async () => {
       try {
         const response = await api.get('/api/users/profile');
+        
         setProfile(response.data);
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -66,13 +68,15 @@ const Profile: React.FC = () => {
       });
 
       // Fetch the updated profile data
-      const response = await api.get('/api/users/profile');
+      const response = await api.get('/api/users/profile', {
+        withCredentials: true,
+      });
       setProfile(response.data);
       setIsCropperOpen(false);
 
       // Update the user state in the AuthContext
       const updatedUser = { ...user, profilePicture: response.data.profilePicture };
-      login(updatedUser, localStorage.getItem('token') || '');
+      setUser(updatedUser);
     } catch (error) {
       console.error('Error saving profile:', error);
     }
@@ -106,7 +110,9 @@ const Profile: React.FC = () => {
       });
       alert('Profile saved successfully');
       // Fetch the updated profile data
-      const response = await api.get('/api/users/profile');
+      const response = await api.get('/api/users/profile', {
+        withCredentials: true,
+      });
       setProfile(response.data);
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -252,7 +258,7 @@ const Profile: React.FC = () => {
           </Box>
           <Button
             as={Link}
-            to={`/profile/${user?.uniqueId}`}
+            to={`/profile/${user?._id}`}
             colorScheme="teal"
             w="100%"
             bg="button"

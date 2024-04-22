@@ -102,10 +102,6 @@ interface GenreColorMap {
     [key: string]: string;
 }
 
-interface GenreDescriptionMap {
-    [key: string]: string;
-}
-
 const MangaDetails: React.FC = () => {
     const { mangaId } = useParams<{ mangaId: any }>();
     const [mangaDetails, setMangaDetails] = useState<MangaDetails | null>(null);
@@ -118,7 +114,7 @@ const MangaDetails: React.FC = () => {
     const { isAuthenticated, user } = useContext(AuthContext);
 
     const API_BASE_URL = 'https://consumet-api-z0sh.onrender.com/meta/anilist/';
-    const DB_BASE_URL = 'https://lorelibraryserver.onrender.com';
+    const DB_BASE_URL = process.env.NODE_URL || 'https://lorelibraryserver.onrender.com';
 
     const genreColor: GenreColorMap = {
         'Action': '#e74c3c',
@@ -167,12 +163,11 @@ const MangaDetails: React.FC = () => {
 
     const fetchReviews = async (mangaId: string): Promise<Review[]> => {
         try {
-            const response = await api.get(`${DB_BASE_URL}manga/${mangaId}/reviews`);
+            const response = await api.get(`${DB_BASE_URL}/manga/${mangaId}/reviews`);
             const reviews = response.data.map((review: any) => {
-                // Assuming the correct uniqueId is stored in a property called 'user.uniqueId'
-                const { uniqueId, username, rating, comment } = review;
+                const { _id, username, rating, comment } = review;
                 return {
-                    uniqueId, // Replace with the correct property name for userId
+                    _id, // Replace with the correct property name for userId
                     username,
                     rating,
                     comment,
@@ -196,14 +191,14 @@ const MangaDetails: React.FC = () => {
 
         try {
             const newReview: Review = {
-                uniqueId: user?.uniqueId || '', // Changed from userId
+                uniqueId: user?._id || '', // Changed from userId
                 username: user?.username || '',
                 rating: newRating,
                 comment: newComment,
                 mangaId: mangaId!
             };
 
-            const response = await api.post(`${DB_BASE_URL}manga/${mangaId}/reviews`, newReview);
+            const response = await api.post(`${DB_BASE_URL}/manga/${mangaId}/reviews`, newReview);
             const savedReview = response.data;
             setReviews([...reviews, savedReview]);
             setNewComment('');
@@ -225,7 +220,7 @@ const MangaDetails: React.FC = () => {
     const handleFollow = async () => {
         if (user && user.userId) {
             try {
-                await api.post(`${DB_BASE_URL}users/${user.userId}/follow/${mangaId}`);
+                await api.post(`${DB_BASE_URL}/users/${user._id}/follow/${mangaId}`);
                 // Refresh the user data or update the state accordingly
             } catch (error) {
                 console.error('Error following manga:', error);
@@ -238,7 +233,7 @@ const MangaDetails: React.FC = () => {
     const handleFavorite = async () => {
         if (user && user.userId) {
             try {
-                await api.post(`${DB_BASE_URL}users/${user.userId}/favorite/${mangaId}`);
+                await api.post(`${DB_BASE_URL}/users/${user._id}/favorite/${mangaId}`);
                 // Refresh the user data or update the state accordingly
             } catch (error) {
                 console.error('Error favoriting manga:', error);
@@ -251,7 +246,7 @@ const MangaDetails: React.FC = () => {
     const handleReading = async () => {
         if (user && user.userId) {
             try {
-                await api.post(`${DB_BASE_URL}users/${user.userId}/reading/${mangaId}`);
+                await api.post(`${DB_BASE_URL}/users/${user._id}/reading/${mangaId}`);
                 // Refresh the user data or update the state accordingly
             } catch (error) {
                 console.error('Error marking manga as reading:', error);

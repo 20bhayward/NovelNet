@@ -5,7 +5,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import MangaPanel from '../../components/Home/MangaPanel';
 import AnnouncementsPanel from '../../components/Home/AnnouncementsPanel';
 import FeaturedManga from '../../components/Home/FeaturedManga';
-import axios from '../../services/api';
+import api from '../../services/api';
 
 const Home: React.FC = () => {
   const { isAuthenticated, user } = useContext(AuthContext);
@@ -17,7 +17,7 @@ const Home: React.FC = () => {
     const fetchUserManga = async () => {
       try {
         if (isAuthenticated && user) {
-          const response = await axios.get(`/api/users/${user.userId}/manga`);
+          const response = await api.get(`/api/users/${user.userId}/manga`,  { withCredentials: true });
           setFollowedManga(response.data.followedManga);
           setFavoriteManga(response.data.favoriteManga);
           setReadingManga(response.data.readingManga);

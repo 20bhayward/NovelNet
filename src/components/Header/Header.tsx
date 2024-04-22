@@ -3,10 +3,9 @@ import { Box, Flex, Spacer, Button, Image, Menu, MenuButton, MenuList, MenuItem,
 import { Link, useNavigate } from 'react-router-dom';
 import SearchBar from '../SearchBar/SearchBar';
 import { AuthContext } from '../../contexts/AuthContext';
-import { logout } from '../../services/authService';
 
 const Header: React.FC = () => {
-  const { isAuthenticated, user, isAdmin } = useContext(AuthContext);
+  const { isAuthenticated, user, isAdmin, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

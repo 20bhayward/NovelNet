@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import mongoose from 'mongoose';
 
@@ -18,27 +19,19 @@ export const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = new User({
       username,
       password: hashedPassword,
       role,
-      uniqueId: new mongoose.Types.ObjectId().toString(),
     });
-    await newUser.save();
+    const savedUser = await newUser.save();
 
-    req.session.currentUser = {
-      userId: newUser._id.toString(),
-      username: newUser.username,
-      role: newUser.role,
-      profilePicture: newUser.profilePicture || '',
-      uniqueId: newUser.uniqueId,
-    };
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: req.session.currentUser,
+    // Generate a JWT token
+    const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
     });
+
+    res.status(201).json({ message: 'User registered successfully', token, user: savedUser });
   } catch (error) {
     console.error('Error during registration:', error);
     res.status(500).json({ message: 'Server error' });
@@ -59,20 +52,12 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: 'Incorrect username or password' });
     }
     if (isPasswordValid) {
-      const { _id, username, role, profilePicture } = user;
-
-      req.session.currentUser = {
-        userId: _id.toString(),
-        username,
-        role,
-        profilePicture,
-        uniqueId: user.uniqueId,
-      };
-
-      res.json({
-        message: 'Login successful',
-        user: req.session.currentUser,
+      // Generate a JWT token
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '7d',
       });
+
+      res.json({ token, user });
     }
   } catch (error) {
     console.error('Error during login:', error);
@@ -81,12 +66,6 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Error destroying session:', err);
-      return res.status(500).json({ message: 'Internal server error' });
-    }
-    res.clearCookie('connect.sid'); // Clear the session cookie
-    res.json({ message: 'Logout successful' });
-  });
+  res.clearCookie('connect.sid'); // Clear the session cookie
+  res.json({ message: 'Logout successful' });
 }; 

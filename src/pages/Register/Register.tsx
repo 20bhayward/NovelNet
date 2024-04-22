@@ -1,17 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { AuthContext } from '../../contexts/AuthContext';
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Button, FormControl, FormLabel, Input, Select, Text, VStack } from '@chakra-ui/react';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -19,22 +10,20 @@ const Register: React.FC = () => {
   const [role, setRole] = useState('User');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { register } = useContext(AuthContext);
+  const { setIsAuthenticated, setUser } = useContext(AuthContext);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-  
     try {
-      const response = await api.post('/api/auth/register', {
-        username,
-        password,
-        role,
-      }, {
-        withCredentials: true,
-      });
-      register(response.data.user);
+      const response = await api.post('/api/auth/register', { username, password, role });
+      const { token, user } = response.data;
+      // Store the token in local storage or an HTTP-only cookie
+      localStorage.setItem('token', token);
+      // Update the user state or context
+      setUser(user);
+      setIsAuthenticated(true);
       navigate('/profile');
-    } catch (error : any) {
+    } catch (error: any) {
       if (error.response) {
         setError(error.response.data.message);
       } else {

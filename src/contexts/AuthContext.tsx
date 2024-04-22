@@ -1,91 +1,87 @@
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
 import api from '../services/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: any;
   isAdmin: boolean;
-  login: (user: any, token: string) => void;
   logout: () => void;
-  register: (user: any) => void;
+  setIsAuthenticated: (val: boolean) => void;
+  setUser: (user: User) => void;
 }
 
-export const AuthContext = createContext<AuthContextType>(
-  {
-    isAuthenticated: false,
-    user: null,
-    isAdmin: false,
-    login: () => { },
-    logout: () => { },
-    register: () => { },
-  });
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  user: null,
+  isAdmin: false,
+  logout: () => {},
+  setIsAuthenticated: () => {},
+  setUser: () => {},
+});
 
 interface User {
-  userId: string;
+  _id: string;
   username: string;
   role: string;
   profilePicture: string;
-  uniqueId: string;
-}
-
-interface Review {
-  userId: string;
-  username: string;
-  rating: number;
-  comment: string;
-  mangaId: string;
 }
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [review, setReview] = useState<Review | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        const token = localStorage.getItem('token');
         const response = await api.get('/api/users/profile', {
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         if (response.data) {
           setUser(response.data);
           setIsAuthenticated(true);
+          setIsAdmin(response.data.role === 'Admin'); // Update isAdmin based on the user's role
         } else {
           setIsAuthenticated(false);
           setUser(null);
+          setIsAdmin(false);
         }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        setIsAuthenticated(false);
-        setUser(null);
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          setIsAuthenticated(false);
+          setUser(null);
+          setIsAdmin(false);
+        } else {
+          console.error('Error fetching user data:', error);
+        }
       }
     };
     fetchUserData();
   }, []);
 
-  const login = (user: any, token: string) => {
-    localStorage.setItem('token', token);
-    setUser(user);
-    setIsAuthenticated(true);
-  };
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    setIsAuthenticated(false);
-  };
-
-  const register = async (user: any) => {
+  const logout = async () => {
     try {
-      const response = await api.post('/api/auth/register', user);
-      setUser(response.data.user);
-      setIsAuthenticated(true);
+      // Clear the token from localStorage
+      localStorage.removeItem('token');
+  
+      // Send a logout request to the server
+      await api.post('/api/auth/logout', {}, { withCredentials: true });
+  
+      // Clear the user data and authentication state
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsAdmin(false);
     } catch (error) {
-      console.error('Error during registration:', error);
+      console.error('Error during logout:', error);
     }
   };
 
-
-  return (<AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout, register }}> {children} </AuthContext.Provider>);
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, isAdmin, user, setUser, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

@@ -22,15 +22,8 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/profile/:uniqueId" element={<PublicProfile />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:_id" element={<PublicProfile />} />
           <Route path="/search" element={<Search />} />
           <Route path="/manga/:mangaId" element={<MangaDetails />} />
           <Route path="/manga/:mangaId/reviews" element={<MangaDetails />} />

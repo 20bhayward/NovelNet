@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 
 interface ProfileComment {
-  uniqueId: string;
+  _id: string;
   username: string;
   comment: string;
   profileId: string;
@@ -18,7 +18,7 @@ interface PublicProfileProps {
 
 const PublicProfile: React.FC = () => {
   const { isAuthenticated, user } = useContext(AuthContext);
-  const { uniqueId } = useParams<{ uniqueId: string }>();
+  const { _id } = useParams();
   const [profile, setProfile] = useState<any>(null);
   const [comments, setComments] = useState<ProfileComment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
@@ -26,27 +26,27 @@ const PublicProfile: React.FC = () => {
   useEffect(() => {
     const fetchPublicProfile = async () => {
       try {
-        const response = await axios.get(`/api/users/profile/${uniqueId}`);
+        const response = await axios.get(`/api/users/profile/${_id}`);
         setProfile(response.data);
       } catch (error) {
         console.error('Error fetching public profile:', error);
       }
     };
-
+  
     const fetchProfileComments = async () => {
       try {
-        const response = await axios.get(`/api/users/profile/${uniqueId}/comments`);
+        const response = await axios.get(`/api/users/profile/${_id}/comments`);
         setComments(response.data);
       } catch (error) {
         console.error('Error fetching profile comments:', error);
       }
     };
-
-    if (uniqueId) {
+  
+    if (_id) {
       fetchPublicProfile();
       fetchProfileComments();
     }
-  }, [uniqueId]);
+  }, [_id]);
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,12 +58,12 @@ const PublicProfile: React.FC = () => {
 
     try {
       const newCommentData = {
-        commenterUniqueId: user?.uniqueId || '',
+        commenterUniqueId: user?._id || '',
         commenterUsername: user?.username || '',
         comment: newComment,
       };
 
-      const response = await axios.post(`/api/users/profile/${uniqueId}/comments`, newCommentData);
+      const response = await axios.post(`/api/users/profile/${_id}/comments`, newCommentData);
       const savedComment = response.data;
       setComments([...comments, savedComment]);
       setNewComment('');
@@ -144,7 +144,7 @@ const PublicProfile: React.FC = () => {
             Comments
           </Heading>
           {comments.map((comment) => (
-            <Box key={comment.uniqueId} mb={4} p={4} bg="section" borderRadius="md">
+            <Box key={comment._id} mb={4} p={4} bg="section" borderRadius="md">
               <Text fontWeight="bold" color="white">{comment.username}</Text>
               <Text mt={2} color="subheading">{comment.comment}</Text>
             </Box>
