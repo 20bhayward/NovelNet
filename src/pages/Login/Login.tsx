@@ -1,7 +1,7 @@
 // Login.tsx
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from '../../services/api';
+import api from '../../services/api';
 import { AuthContext } from '../../contexts/AuthContext';
 import { Box, Avatar, Grid, Divider, Heading, Text, Textarea, Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 
@@ -16,7 +16,7 @@ const Login = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('/api/auth/login', { username, password });
+      const response = await api.post('/api/auth/login', { username, password });
       localStorage.setItem('token', response.data.token);
       login(response.data.user, response.data.token);
       navigate('/profile');

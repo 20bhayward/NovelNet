@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import api from '../services/api';
 
 interface AuthContextType {
@@ -7,17 +8,18 @@ interface AuthContextType {
   isAdmin: boolean;
   login: (user: any, token: string) => void;
   logout: () => void;
-  register: (user: any, token: string) => void;
+  register: (user: any) => void;
 }
 
-export const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: false,
-  user: null,
-  isAdmin: false,
-  login: () => {},
-  logout: () => {},
-  register: () => {},
-});
+export const AuthContext = createContext<AuthContextType>(
+  {
+    isAuthenticated: false,
+    user: null,
+    isAdmin: false,
+    login: () => { },
+    logout: () => { },
+    register: () => { },
+  });
 
 interface User {
   userId: string;
@@ -44,11 +46,8 @@ export const AuthProvider: React.FC = ({ children }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token');
         const response = await api.get('/api/users/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         });
         if (response.data) {
           setUser(response.data);
@@ -71,7 +70,6 @@ export const AuthProvider: React.FC = ({ children }) => {
     setUser(user);
     setIsAuthenticated(true);
   };
-
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -81,16 +79,13 @@ export const AuthProvider: React.FC = ({ children }) => {
   const register = async (user: any) => {
     try {
       const response = await api.post('/api/auth/register', user);
-      // Redirect to the home screen
-      window.location.href = '/';
+      setUser(response.data.user);
+      setIsAuthenticated(true);
     } catch (error) {
       console.error('Error during registration:', error);
     }
   };
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout, register }}>
-      {children}
-    </AuthContext.Provider>
-  );
+
+  return (<AuthContext.Provider value={{ isAuthenticated, isAdmin, user, login, logout, register }}> {children} </AuthContext.Provider>);
 };

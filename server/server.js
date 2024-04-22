@@ -2,10 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import session from 'express-session';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import mangaRoutes from './routes/mangaRoutes.js';
+import mangaRoutes from './routes/mangaRoutes.js'; // Import manga routes
 import bcrypt from 'bcrypt';
 import User from './models/User.js';
 import multer from 'multer';
@@ -19,51 +18,46 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 
 // Middleware
-app.use(express.json());
-const allowedOrigins = ['http://localhost:3000', 'https://main--lorelibrary.netlify.app/', 'https://lorelibraryserver.onrender.com', 'https://lorelibraryserver.onrender.com/api', 'https://consumet-api-z0sh.onrender.com', 'https://consumet-api-z0sh.onrender.com/meta/anilist/'];
-
-// Middleware to verify the token
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-    req.userId = decoded.userId;
-    next();
-  });
-};
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Origin not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
-
-app.use(session({
-  secret: process.env.SECRET_KEY,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-  },
-}));
+const allowedOrigins = ['http://localhost:3000', 'https://main--lorelibrary.netlify.app/', 'https://lorelibraryserver.onrender.com', 'https://consumet-api-z0sh.onrender.com', 'https://consumet-api-z0sh.onrender.com/meta/anilist/']; // Add your React app's origin(s) here
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://20bhayward:LoreMaster@lorelibrarydata.tbi2ztc.mongodb.net/', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect('mongodb+srv://20bhayward:LoreMaster@lorelibrarydata.tbi2ztc.mongodb.net/?retryWrites=true&w=majority&appName=LoreLibraryData');
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Origin not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }));
+// app.use(session({
+//   secret: process.env.SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: false,
+//   // cookie: {
+//   //   secure: process.env.NODE_ENV === 'production',
+//   //   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+//   // },
+// }));
+const sessionOptions = {
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+};
+if (process.env.NODE_ENV !== "development") {
+  sessionOptions.proxy = true;
+  sessionOptions.cookie = {
+      sameSite: "none",
+      secure: true,
+      domain: process.env.HTTP_SERVER_DOMAIN,
+  };
+}
+app.use(session(sessionOptions));
+app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -71,15 +65,15 @@ app.post('/api/auth/logout', logout);
 app.use('/api/users', userRoutes);
 app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
 app.use('/uploads/profile-pictures', express.static(path.join(path.resolve(), 'uploads', 'profile-pictures')));
-app.use('/api/manga', mangaRoutes);
+app.use('/api/manga', mangaRoutes); // Use manga routes
 
-app.get('/api/users/profile', verifyToken, getUserProfile);
+app.get('/api/users/profile', authMiddleware, getUserProfile);
 
 // Route for profile picture upload
 app.post('/api/users/profile/picture', upload.single('profilePicture'), async (req, res) => {
   try {
     // Handle the uploaded file and update the user's profile picture
-    const userId = req.userId;
+    const userId = req.session.currentUser.uniqueId;
     const filePath = req.file.path;
 
     // Update the user's profile picture in the database
@@ -122,10 +116,8 @@ app.get('/api/users/profile/:uniqueId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 app.get('/api/users/profile/:uniqueId/comments', getProfileComments);
 app.post('/api/users/profile/:uniqueId/comments', submitProfileComment);
-
 // Fetch reviews
 app.get('/api/manga/:mangaId/reviews', async (req, res) => {
   try {

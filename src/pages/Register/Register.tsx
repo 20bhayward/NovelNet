@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from '../../services/api';
+import api from '../../services/api';
 import { AuthContext } from '../../contexts/AuthContext';
 import {
   Box,
@@ -25,13 +25,14 @@ const Register: React.FC = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('/api/auth/register', {
+      const response = await api.post('/api/auth/register', {
         username,
         password,
         role,
+      }, {
+        withCredentials: true,
       });
-      localStorage.setItem('token', response.data.token);
-      register(response.data.user, response.data.token);
+      register(response.data.user);
       navigate('/profile');
     } catch (error : any) {
       if (error.response) {
