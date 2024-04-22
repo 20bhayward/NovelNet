@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import axios from 'axios';
-import { FaStar, FaHeart, FaEye, FaArrowLeft, FaRegHeart, FaBook, FaRegBookmark } from 'react-icons/fa';
+import { FaStar, FaHeart, FaEye, FaArrowLeft, FaRegHeart, FaBook, FaRegBookmark, FaBookmark } from 'react-icons/fa';
 import { AuthContext } from '../../contexts/AuthContext';
 import {
     Box,
@@ -112,6 +112,9 @@ const MangaDetails: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const { isAuthenticated, user } = useContext(AuthContext);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isReading, setIsReading] = useState(false);
 
     const API_BASE_URL = 'https://consumet-api-z0sh.onrender.com/meta/anilist/';
     const DB_BASE_URL = process.env.NODE_URL || 'https://lorelibraryserver.onrender.com';
@@ -155,26 +158,30 @@ const MangaDetails: React.FC = () => {
 
             setIsLoading(false);
         };
-
+        const fetchUserManga = async () => {
+            try {
+                const response = await api.get(`/api/users/${user?._id}/manga`);
+                const { followedManga, favoriteManga, readingManga } = response.data;
+                setIsFollowing(followedManga.includes(mangaId));
+                setIsFavorite(favoriteManga.includes(mangaId));
+                setIsReading(readingManga.includes(mangaId));
+            } catch (error) {
+                console.error('Error fetching user manga:', error);
+            }
+        };
         if (mangaId) {
             fetchMangaDetails();
         }
-    }, [mangaId]);
+
+        if (user && mangaId) {
+            fetchUserManga();
+        }
+    }, [user, mangaId]);
 
     const fetchReviews = async (mangaId: string): Promise<Review[]> => {
         try {
-            const response = await api.get(`${DB_BASE_URL}/manga/${mangaId}/reviews`);
-            const reviews = response.data.map((review: any) => {
-                const { _id, username, rating, comment } = review;
-                return {
-                    _id, // Replace with the correct property name for userId
-                    username,
-                    rating,
-                    comment,
-                    mangaId
-                };
-            });
-            return reviews;
+            const response = await api.get(`/api/manga/${mangaId}/reviews`);
+            return response.data;
         } catch (error) {
             console.error('Error fetching reviews:', error);
             return [];
@@ -191,16 +198,16 @@ const MangaDetails: React.FC = () => {
 
         try {
             const newReview: Review = {
-                uniqueId: user?._id || '', // Changed from userId
+                uniqueId: user?._id || '',
                 username: user?.username || '',
                 rating: newRating,
                 comment: newComment,
-                mangaId: mangaId!
+                mangaId: mangaId!,
             };
 
-            const response = await api.post(`${DB_BASE_URL}/manga/${mangaId}/reviews`, newReview);
-            const savedReview = response.data;
-            setReviews([...reviews, savedReview]);
+            await api.post(`/api/manga/${mangaId}/reviews`, newReview);
+            const updatedReviews = await fetchReviews(mangaId!);
+            setReviews(updatedReviews);
             setNewComment('');
             setNewRating(0);
         } catch (error) {
@@ -209,21 +216,27 @@ const MangaDetails: React.FC = () => {
         }
     };
 
-    const handleViewProfile = (uniqueId: string) => {
+    const handleViewProfile = (_id: string) => {
         if (user) {
-            navigate(`/profile/${uniqueId}`);
+            navigate(`/profile/${_id}`);
         } else {
             // Handle the case when the user object is not available
             navigate('/default-profile');
         }
     }
+
     const handleFollow = async () => {
-        if (user && user.userId) {
+        if (user && user._id) {
             try {
-                await api.post(`${DB_BASE_URL}/users/${user._id}/follow/${mangaId}`);
-                // Refresh the user data or update the state accordingly
+                if (isFollowing) {
+                    await api.post(`/api/users/${user._id}/unfollow/${mangaId}`);
+                    setIsFollowing(false);
+                } else {
+                    await api.post(`/api/users/${user._id}/follow/${mangaId}`);
+                    setIsFollowing(true);
+                }
             } catch (error) {
-                console.error('Error following manga:', error);
+                console.error('Error toggling follow:', error);
             }
         } else {
             console.error('User not authenticated or user ID not available');
@@ -231,12 +244,17 @@ const MangaDetails: React.FC = () => {
     };
 
     const handleFavorite = async () => {
-        if (user && user.userId) {
+        if (user && user._id) {
             try {
-                await api.post(`${DB_BASE_URL}/users/${user._id}/favorite/${mangaId}`);
-                // Refresh the user data or update the state accordingly
+                if (isFavorite) {
+                    await api.post(`/api/users/${user._id}/unfavorite/${mangaId}`);
+                    setIsFavorite(false);
+                } else {
+                    await api.post(`/api/users/${user._id}/favorite/${mangaId}`);
+                    setIsFavorite(true);
+                }
             } catch (error) {
-                console.error('Error favoriting manga:', error);
+                console.error('Error toggling favorite:', error);
             }
         } else {
             console.error('User not authenticated or user ID not available');
@@ -244,17 +262,23 @@ const MangaDetails: React.FC = () => {
     };
 
     const handleReading = async () => {
-        if (user && user.userId) {
+        if (user && user._id) {
             try {
-                await api.post(`${DB_BASE_URL}/users/${user._id}/reading/${mangaId}`);
-                // Refresh the user data or update the state accordingly
+                if (isReading) {
+                    await api.post(`/api/users/${user._id}/unreading/${mangaId}`);
+                    setIsReading(false);
+                } else {
+                    await api.post(`/api/users/${user._id}/reading/${mangaId}`);
+                    setIsReading(true);
+                }
             } catch (error) {
-                console.error('Error marking manga as reading:', error);
+                console.error('Error toggling reading:', error);
             }
         } else {
             console.error('User not authenticated or user ID not available');
         }
     };
+
     if (isLoading) {
         return (
             <Box bg="background" minH="100vh" display="flex" justifyContent="center" alignItems="center">
@@ -306,27 +330,30 @@ const MangaDetails: React.FC = () => {
                         <Box bg="subbackground" p={4} mt={4} borderRadius="md">
                             <Flex justify="center">
                                 <Button
-                                    colorScheme="orange"
+                                    colorScheme={isFollowing ? 'green' : 'orange'}
                                     mr={4}
                                     onClick={handleFollow}
-                                    leftIcon={<FaRegBookmark />}
+                                    leftIcon={isFollowing ? <FaBookmark /> : <FaRegBookmark />}
+                                    width="120px"
                                 >
-                                    Follow
+                                    {isFollowing ? 'Following' : 'Follow'}
                                 </Button>
                                 <Button
-                                    colorScheme="red"
+                                    colorScheme={isFavorite ? 'pink' : 'red'}
                                     mr={4}
                                     onClick={handleFavorite}
-                                    leftIcon={<FaRegHeart />}
+                                    leftIcon={isFavorite ? <FaHeart /> : <FaRegHeart />}
+                                    width="120px"
                                 >
-                                    Favorite
+                                    {isFavorite ? 'Favorited' : 'Favorite'}
                                 </Button>
                                 <Button
-                                    colorScheme="blue"
+                                    colorScheme={isReading ? 'gray' : 'green'}
                                     onClick={handleReading}
                                     leftIcon={<FaBook />}
+                                    width="120px"
                                 >
-                                    Reading
+                                    {isReading ? 'Drop' : 'Read'}
                                 </Button>
                             </Flex>
                         </Box>

@@ -149,7 +149,7 @@ const FeaturedManga: React.FC = () => {
   };
  
   return (
-    <Box bg="subbackground" p={4} borderRadius="md" boxShadow="md">
+    <Box bg="subbackground" p={4} borderRadius="md" boxShadow="md" height='100%'>
       <Heading as="h2" size="xl" mb={4} color="heading">
         Featured Manga
       </Heading>

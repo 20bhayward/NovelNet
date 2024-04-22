@@ -12,6 +12,7 @@ import PublicProfile from './pages/Profile/PublicProfile';
 import MangaDetails from './pages/Details/MangaDetails';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import theme from './theme';
+import AnnouncementsPage from './pages/Announcements/AnnouncementsPage';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/announcements" element={<AnnouncementsPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:_id" element={<PublicProfile />} />

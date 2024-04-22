@@ -28,6 +28,10 @@ const Header: React.FC = () => {
     navigate('/profile');
   };
 
+  const handleAnnouncements = () => {
+    navigate('/announcements');
+  };
+
   const handleMenuOpen = () => setIsMenuOpen(!isMenuOpen);
   const handleMenuClose = () => setIsMenuOpen(false);
 
@@ -49,6 +53,9 @@ const Header: React.FC = () => {
           </Button>
           <Button flex="1" variant="ghost" onClick={handleAdvancedSearch} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
             Advanced Search
+          </Button>
+          <Button flex="1" variant="ghost" onClick={handleAnnouncements} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
+            Announcements
           </Button>
         </Box>
         <Spacer flex="1" />

@@ -43,7 +43,7 @@ export const AuthProvider: React.FC = ({ children }) => {
         if (response.data) {
           setUser(response.data);
           setIsAuthenticated(true);
-          setIsAdmin(response.data.role === 'Admin'); // Update isAdmin based on the user's role
+          setIsAdmin(response.data?.role === 'Admin'); // Update isAdmin based on the user's role
         } else {
           setIsAuthenticated(false);
           setUser(null);
