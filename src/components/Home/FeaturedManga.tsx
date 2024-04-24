@@ -147,14 +147,14 @@ const FeaturedManga: React.FC = () => {
       opacity: 0,
     }),
   };
- 
+
   return (
-    <Box bg="subbackground" p={4} borderRadius="md" boxShadow="md" height='100%'>
+    <Box bg="subbackground" p={4} borderRadius="md" boxShadow="md" height="100%">
       <Heading as="h2" size="xl" mb={4} color="heading">
         Featured Manga
       </Heading>
-      <Flex>
-        <Box  as={Link} to={`/manga/${currentManga?.id}`} flex="2" position="relative" overflow="hidden" height="400px">
+      <Flex flexDirection={['column', 'column', 'row']} alignItems="center">
+        <Box flex="2" position="relative" overflow="hidden" height={['300px', '300px', '400px']} mr={[0, 0, 4]}>
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={currentManga?.id}
@@ -213,7 +213,7 @@ const FeaturedManga: React.FC = () => {
             </motion.div>
           </AnimatePresence>
         </Box>
-        <Box flex="1" ml={4}>
+        <Box flex="1" ml={[0, 0, 4]} mt={[4, 4, 0]}>
           <img
             src={currentManga?.image}
             alt={
@@ -221,12 +221,11 @@ const FeaturedManga: React.FC = () => {
               currentManga?.title.english ||
               currentManga?.title.native
             }
-            style={{ width: '300px', height: '400px', objectFit: 'scale-down' }}
+            style={{ width: '100%', height: 'auto', maxHeight: '400px', objectFit: 'contain' }}
           />
         </Box>
       </Flex>
       <Flex mt={4} justifyContent="center" alignItems="center">
-      <Box flex={1}></Box>
         <Icon
           as={FaChevronLeft}
           mr={2}
@@ -234,10 +233,8 @@ const FeaturedManga: React.FC = () => {
           cursor="pointer"
           onClick={handlePrev}
         />
-        
         {featuredManga.map((_, index) => (
           <Icon
-          
             key={index}
             as={FaCircle}
             color={index === activeIndex ? 'button' : 'background'}
@@ -254,7 +251,6 @@ const FeaturedManga: React.FC = () => {
           cursor="pointer"
           onClick={handleNext}
         />
-        <Box flex={2}></Box>
       </Flex>
     </Box>
   );

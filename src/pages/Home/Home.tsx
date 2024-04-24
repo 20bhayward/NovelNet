@@ -25,6 +25,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchUserManga = async () => {
       try {
+        setIsLoading(false);
         if (isAuthenticated && user) {
           setIsLoading(true);
           const response = await api.get(`/api/users/${user._id}/manga`, { withCredentials: true });
@@ -33,10 +34,9 @@ const Home: React.FC = () => {
           setFavoriteManga(favoriteManga);
           setReadingManga(readingManga);
           setIsLoading(false);
-        }
+        } 
       } catch (error) {
         console.error('Error fetching user manga:', error);
-        setIsLoading(false);
       }
     };
 
@@ -54,14 +54,22 @@ const Home: React.FC = () => {
   return (
     <Box bg="background" minH="100vh" p={4}>
       <Flex direction={['column', 'column', 'row']} mb={8}>
-        <Box flex="1"></Box>
+      {isAuthenticated && user ? (
+        <><Box flex="1"></Box>
         <Box flex="5" mr={[0, 0, 25]}>
           <FeaturedManga />
         </Box>
         <Box flex="2">
           <AnnouncementsPanel />
         </Box>
-        <Box flex="1"></Box>
+        <Box flex="1"></Box></>
+      ) : ( 
+        <> <Box flex="1"></Box>
+      <Box flex="7" mr={[0, 0, 25]}>
+        <FeaturedManga />
+      </Box>
+      <Box flex="1"></Box></>
+      )};
       </Flex>
       {isAuthenticated && user ? (
         <>
