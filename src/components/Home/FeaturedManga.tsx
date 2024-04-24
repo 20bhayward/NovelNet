@@ -154,7 +154,7 @@ const FeaturedManga: React.FC = () => {
         Featured Manga
       </Heading>
       <Flex flexDirection={['column', 'column', 'row']} alignItems="center">
-        <Box flex="2" position="relative" overflow="hidden" height={['300px', '300px', '400px']} mr={[0, 0, 4]}>
+        <Box as={Link} to={`/manga/${currentManga?.id}`}  flex="2" position="relative" overflow="hidden" height={['300px', '300px', '400px']} mr={[0, 0, 4]}>
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={currentManga?.id}

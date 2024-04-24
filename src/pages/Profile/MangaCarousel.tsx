@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 interface Manga {
   _id: string;
+  id: string;
   title: string;
   image: string;
   rating?: number;
@@ -77,7 +78,7 @@ const MangaCarousel: React.FC<MangaCarouselProps> = ({ manga }) => {
                 borderRadius: '0.5rem',
                 overflow: 'hidden',
                 boxShadow: 'md',
-                height: '300px',
+                height: '400px',
               }}
             >
               <Box
@@ -85,7 +86,7 @@ const MangaCarousel: React.FC<MangaCarouselProps> = ({ manga }) => {
                 height="100%"
                 cursor="pointer"
                 as={Link}
-                to={`/manga/${item._id}`}
+                to={`/manga/${item.id}`}
               >
                 <Image src={item.image} alt={item.title} objectFit="cover" height="200px" />
                 <Box p={2}>

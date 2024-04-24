@@ -224,7 +224,7 @@ const Profile: React.FC = () => {
                 }
               />
             </FormControl>
-            <Button colorScheme="blue" onClick={handleSaveProfile} w="100%" bg="button" _hover={{ bg: "blue.600" }}>
+            <Button colorScheme="blue" color="white" onClick={handleSaveProfile} w="100%" bg="button" _hover={{ bg: "blue.600" }}>
               Save Profile
             </Button>
           </Box>
@@ -252,7 +252,7 @@ const Profile: React.FC = () => {
                 onChange={(event) => setNewPassword(event.target.value)}
               />
             </FormControl>
-            <Button colorScheme="blue" onClick={handleChangePassword} w="100%" bg="button" _hover={{ bg: "blue.600" }}>
+            <Button colorScheme="blue" color="white" onClick={handleChangePassword} w="100%" bg="button" _hover={{ bg: "blue.600" }}>
               Change Password
             </Button>
           </Box>
@@ -260,6 +260,7 @@ const Profile: React.FC = () => {
             as={Link}
             to={`/profile/${user?._id}`}
             colorScheme="teal"
+            color="white"
             w="100%"
             bg="button"
             _hover={{ bg: "teal.600" }}

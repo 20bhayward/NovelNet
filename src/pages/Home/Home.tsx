@@ -69,7 +69,7 @@ const Home: React.FC = () => {
         <FeaturedManga />
       </Box>
       <Box flex="1"></Box></>
-      )};
+      )}
       </Flex>
       {isAuthenticated && user ? (
         <>

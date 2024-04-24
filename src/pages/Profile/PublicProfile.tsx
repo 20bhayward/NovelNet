@@ -16,6 +16,7 @@ interface ProfileComment {
 
 interface Manga {
   _id: string;
+  id: string;
   title: string;
   image: string;
   rating?: number;
