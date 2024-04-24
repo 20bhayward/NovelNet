@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Avatar, Grid, Divider, Heading, Text, Textarea, Button, Spinner, Flex, Select, Tabs, TabList, Tab, TabPanels, TabPanel, GridItem } from '@chakra-ui/react';
+import { Box, Avatar, Grid, Divider, Heading, Text, Textarea, Button, Spinner, Flex, Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { Image } from '@chakra-ui/react';
 import api from '../../services/api';
-import axios from 'axios';
 import MangaCarousel from './MangaCarousel';
-import { MangaContext, MangaProvider } from '../../contexts/MangaContext';
 
 interface ProfileComment {
   _id: string;
@@ -20,9 +18,9 @@ interface Manga {
   _id: string;
   title: string;
   image: string;
-  rating: number;
-  popularity: number;
-  lastVisited: number;
+  rating?: number;
+  popularity?: number;
+  lastVisited?: number;
 }
 
 const PublicProfile: React.FC = () => {
@@ -32,13 +30,10 @@ const PublicProfile: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
   const [comments, setComments] = useState<ProfileComment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
   const [followedManga, setFollowedManga] = useState<Manga[]>([]);
   const [favoriteManga, setFavoriteManga] = useState<Manga[]>([]);
   const [readingManga, setReadingManga] = useState<Manga[]>([]);
-  const [sortBy, setSortBy] = useState<string>('lastVisited');
-  const [isLoading, setIsLoading] = useState(false);
-  const { mangaLists, updateMangaLists } = useContext(MangaContext);
-
 
   useEffect(() => {
     const fetchPublicProfile = async () => {
@@ -61,11 +56,13 @@ const PublicProfile: React.FC = () => {
 
     const fetchUserManga = async () => {
       try {
-        const response = await api.get(`/api/users/${_id}/manga`);
-        const { followedManga, favoriteManga, readingManga } = response.data;
-        setFollowedManga(followedManga);
-        setFavoriteManga(favoriteManga);
-        setReadingManga(readingManga);
+        if (isAuthenticated && user) {
+          const response = await api.get(`/api/users/${user._id}/manga`, { withCredentials: true });
+          const { followedManga, favoriteManga, readingManga } = response.data;
+          setFollowedManga(followedManga);
+          setFavoriteManga(favoriteManga);
+          setReadingManga(readingManga);
+        }
       } catch (error) {
         console.error('Error fetching user manga:', error);
       }
@@ -74,9 +71,9 @@ const PublicProfile: React.FC = () => {
     if (_id) {
       fetchPublicProfile();
       fetchProfileComments();
-      fetchUserManga();
     }
-  }, [_id]);
+    fetchUserManga();
+  }, [_id, isAuthenticated, user]);
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +90,7 @@ const PublicProfile: React.FC = () => {
         comment: newComment,
       };
 
-      const response = await axios.post(`/api/users/profile/${_id}/comments`, newCommentData);
+      const response = await api.post(`/api/users/profile/${_id}/comments`, newCommentData);
       const savedComment = response.data;
       setComments([...comments, savedComment]);
       setNewComment('');
@@ -112,90 +109,94 @@ const PublicProfile: React.FC = () => {
   }
 
   return (
-    <MangaProvider _id={_id}>
-      <Box bg="background" minHeight="100vh" py={8}>
-        <Grid templateColumns={['1fr', '1fr', '1fr 2fr']} gap={8} maxW="1200px" mx="auto">
-          <Box bg="subbackground" p={6} borderRadius="md" boxShadow="md">
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <Avatar
-                size="2xl"
-                name={profile.username}
-                src={profile.profilePicture ? `${process.env.REACT_APP_API_URL}${profile.profilePicture}` : ''}
-                mb={4}
-              />
+    <Box bg="background" minHeight="100vh" py={8}>
+      <Grid templateColumns={['1fr', '1fr', '1fr 2fr']} gap={8} maxW="1200px" mx="auto">
+        <Box bg="subbackground" p={6} borderRadius="md" boxShadow="md">
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Avatar
+              size="2xl"
+              name={profile.username}
+              src={profile.profilePicture ? `${process.env.REACT_APP_API_URL}${profile.profilePicture}` : ''}
+              mb={4}
+            />
+          </Box>
+          <Heading as="h2" size="xl" color="white" textAlign="center" mb={2}>
+            {profile.username}
+          </Heading>
+          <Divider my={4} />
+          <Text fontSize="xl" textAlign="center" color="white" mb={2}>
+            {profile.firstName} {profile.lastName}
+          </Text>
+          <Text fontSize="lg" textAlign="center" color="white" mb={2}>
+            {profile.gender}
+          </Text>
+          <Text fontSize="lg" textAlign="center" color="white">
+            {profile.location}
+          </Text>
+        </Box>
+        <Box>
+          <Tabs>
+            <TabList boxSize={10} color="subbackground" bg="subbackground">
+              <Tab bg="subbackground" color="white" _selected={{ color: 'white', bg: 'gray' }}>
+                Following
+              </Tab>
+              <Tab bg="subbackground" color="white" _selected={{ color: 'white', bg: 'gray' }}>
+                Favorites
+              </Tab>
+              <Tab bg="subbackground" color="white" _selected={{ color: 'white', bg: 'gray' }}>
+                Reading
+              </Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <MangaCarousel manga={followedManga || []} />
+              </TabPanel>
+              <TabPanel>
+                <MangaCarousel manga={favoriteManga || []} />
+              </TabPanel>
+              <TabPanel>
+                <MangaCarousel manga={readingManga || []} />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Box>
+      </Grid>
+      <Box mt={8} maxW="1200px" mx="auto">
+        <Box bg="subbackground" p={6} borderRadius="md" boxShadow="md">
+          <Heading as="h3" size="lg" mb={4} color="heading">
+            Comments
+          </Heading>
+          {comments.map((comment) => (
+            <Box key={comment.key} mb={4} p={4} bg="section" borderRadius="md">
+              <Text fontWeight="bold" color="white">
+                {comment.username}
+              </Text>
+              <Text mt={2} color="subheading">
+                {comment.comment}
+              </Text>
             </Box>
-            <Heading as="h2" size="xl" color="white" textAlign="center" mb={2}>
-              {profile.username}
-            </Heading>
-            <Divider my={4} />
-            <Text fontSize="xl" textAlign="center" color="white" mb={2}>
-              {profile.firstName} {profile.lastName}
-            </Text>
-            <Text fontSize="lg" textAlign="center" color="white" mb={2}>
-              {profile.gender}
-            </Text>
-            <Text fontSize="lg" textAlign="center" color="white">
-              {profile.location}
-            </Text>
-          </Box>
-          <Box>
-            <Tabs>
-              <TabList boxSize={10} color='subbackground' bg='subbackground'>
-                <Tab bg='subbackground' color="white" _selected={{ color: 'white', bg: 'gray' }}>Following</Tab>
-                <Tab bg='subbackground' color="white" _selected={{ color: 'white', bg: 'gray' }}>Favorites</Tab>
-                <Tab bg='subbackground' color="white" _selected={{ color: 'white', bg: 'gray' }}>Reading</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  <MangaCarousel manga={followedManga} />
-                </TabPanel>
-                <TabPanel>
-                  <MangaCarousel manga={favoriteManga} />
-                </TabPanel>
-                <TabPanel>
-                  <MangaCarousel manga={readingManga} />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </Box>
-        </Grid>
-        <Box mt={8} maxW="1200px" mx="auto">
-          <Box bg="subbackground" p={6} borderRadius="md" boxShadow="md">
-            <Heading as="h3" size="lg" mb={4} color="heading">
-              Comments
-            </Heading>
-            {comments.map((comment) => (
-              <Box key={comment.key} mb={4} p={4} bg="section" borderRadius="md">
-                <Text fontWeight="bold" color="white">
-                  {comment.username}
-                </Text>
-                <Text mt={2} color="subheading">
-                  {comment.comment}
-                </Text>
-              </Box>
-            ))}
-            {isAuthenticated && (
-              <form onSubmit={handleCommentSubmit}>
-                <Textarea
-                  placeholder="Leave a comment"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  mb={4}
-                  bg="section"
-                  color="white"
-                  borderColor="subbackground"
-                  _hover={{ borderColor: 'gray.400' }}
-                  _focus={{ borderColor: 'blue.500', boxShadow: 'none' }}
-                />
-                <Button type="submit" colorScheme="blue">
-                  Submit
-                </Button>
-              </form>
-            )}
-          </Box>
+          ))}
+          {isAuthenticated && (
+            <form onSubmit={handleCommentSubmit}>
+              <Textarea
+                placeholder="Leave a comment"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                mb={4}
+                bg="section"
+                color="white"
+                borderColor="subbackground"
+                _hover={{ borderColor: 'gray.400' }}
+                _focus={{ borderColor: 'blue.500', boxShadow: 'none' }}
+              />
+              <Button type="submit" colorScheme="blue">
+                Submit
+              </Button>
+            </form>
+          )}
         </Box>
       </Box>
-    </MangaProvider>
+    </Box>
   );
 };
 

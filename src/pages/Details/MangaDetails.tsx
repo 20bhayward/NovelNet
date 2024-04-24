@@ -224,16 +224,17 @@ const MangaDetails: React.FC = () => {
             navigate('/default-profile');
         }
     }
-   const handleFollow = async () => {
+
+    const handleFollow = async () => {
         if (user && user._id && mangaDetails) {
             try {
+                setIsFollowing(!isFollowing);
                 if (isFollowing) {
                     await api.post(`/api/users/${user._id}/unfollow/${mangaId}`);
-                    setIsFollowing(false);
                 } else {
                     await api.post(`/api/users/${user._id}/follow/${mangaId}`, mangaDetails);
-                    setIsFollowing(true);
                 }
+
             } catch (error) {
                 console.error('Error toggling follow:', error);
             }
@@ -242,16 +243,18 @@ const MangaDetails: React.FC = () => {
         }
     };
 
+    // Similar changes for handleFavorite and handleReading functions
+
     const handleFavorite = async () => {
         if (user && user._id && mangaDetails) {
             try {
+                setIsFavorite(!isFavorite);
                 if (isFavorite) {
                     await api.post(`/api/users/${user._id}/unfavorite/${mangaId}`);
-                    setIsFavorite(false);
                 } else {
                     await api.post(`/api/users/${user._id}/favorite/${mangaId}`, mangaDetails);
-                    setIsFavorite(true);
                 }
+
             } catch (error) {
                 console.error('Error toggling favorite:', error);
             }
@@ -263,13 +266,13 @@ const MangaDetails: React.FC = () => {
     const handleReading = async () => {
         if (user && user._id && mangaDetails) {
             try {
+                setIsReading(!isReading);
                 if (isReading) {
                     await api.post(`/api/users/${user._id}/unreading/${mangaId}`);
-                    setIsReading(false);
                 } else {
                     await api.post(`/api/users/${user._id}/reading/${mangaId}`, mangaDetails);
-                    setIsReading(true);
                 }
+
             } catch (error) {
                 console.error('Error toggling reading:', error);
             }
@@ -277,7 +280,7 @@ const MangaDetails: React.FC = () => {
             console.error('User not authenticated, user ID not available, or manga details not loaded');
         }
     };
-    
+
     if (isLoading) {
         return (
             <Box bg="background" minH="100vh" display="flex" justifyContent="center" alignItems="center">

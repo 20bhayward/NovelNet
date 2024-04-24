@@ -102,55 +102,60 @@ export const updateProfile = async (req, res) => {
 
 };
 
-const saveMangaDetails = async (mangaData) => {
+const createBareManga = async (id, title, image) => {
   try {
-    const manga = await Manga.findOneAndUpdate(
-      { id: mangaData.id },
-      {
-        id: mangaData.id,
-        title: mangaData.title.romaji || mangaData.title.english || mangaData.title.native,
-        altTitles: mangaData.title,
-        malId: mangaData.malId,
-        image: mangaData.image,
-        popularity: mangaData.popularity,
-        color: mangaData.color,
-        description: mangaData.description,
-        status: mangaData.status,
-        releaseDate: mangaData.releaseDate,
-        startDate: mangaData.startDate,
-        endDate: mangaData.endDate,
-        rating: mangaData.rating,
-        genres: mangaData.genres,
-        season: mangaData.season,
-        studios: mangaData.studios,
-        type: mangaData.type,
-      },
-      { upsert: true, new: true }
-    );
-    return manga;
+    const newManga = new Manga({
+      id: id,
+      title: title || '',
+      image: image,
+      altTitles: ["Alt"],
+      malId: 0,
+      popularity: 0,
+      description: "Several hundred years ago",
+      status: "Completed",
+      rating: 0,
+      genres: ["Action"],
+      type: "TV",
+    });
+    await newManga.save();
+    console.log('New manga created:', newManga);
   } catch (error) {
-    console.error('Error saving manga details:', error);
-    throw error;
+    console.error('Error creating new manga:', error);
   }
 };
-
 
 export const followManga = async (req, res) => {
   try {
     const userId = req.user._id;
     const mangaId = req.params.mangaId;
-    const mangaData = req.body;
+    const { title, image } = req.body;
+
+    console.log('Following manga:', mangaId, 'for user:', userId);
+
     const user = await User.findById(userId);
     if (!user) {
+      console.log('User not found:', userId);
       return res.status(404).json({ message: 'User not found' });
     }
+
     if (!user.followedManga.includes(mangaId)) {
       user.followedManga.push(mangaId);
       await user.save();
 
-      // Save the manga details in the Manga collection
-      await saveMangaDetails(mangaData);
+      console.log('User updated, following manga:', mangaId, 'for user:', userId);
+
+      const existingManga = await Manga.findOne({ id: mangaId });
+
+      if (!existingManga) {
+        console.log('Manga does not exist, creating new entry:', mangaId);
+        await createBareManga(mangaId, title.english || title.romaji || title.native, image);
+      } else {
+        console.log('Manga already exists:', mangaId);
+      }
+    } else {
+      console.log('User is already following manga:', mangaId, 'for user:', userId);
     }
+
     res.json({ message: 'Manga followed successfully' });
   } catch (error) {
     console.error('Error following manga:', error);
@@ -162,18 +167,34 @@ export const favoriteManga = async (req, res) => {
   try {
     const userId = req.user._id;
     const mangaId = req.params.mangaId;
-    const mangaData = req.body;
+    const { title, image } = req.body;
+
+    console.log('Favoriting manga:', mangaId, 'for user:', userId);
+
     const user = await User.findById(userId);
     if (!user) {
+      console.log('User not found:', userId);
       return res.status(404).json({ message: 'User not found' });
     }
+
     if (!user.favoriteManga.includes(mangaId)) {
       user.favoriteManga.push(mangaId);
       await user.save();
 
-       // Save the manga details in the Manga collection
-       await saveMangaDetails(mangaData);
+      console.log('User updated, favoriting manga:', mangaId, 'for user:', userId);
+
+      const existingManga = await Manga.findOne({ id: mangaId });
+
+      if (!existingManga) {
+        console.log('Manga does not exist, creating new entry:', mangaId);
+        await createBareManga(mangaId, title.english || title.romaji || title.native, image);
+      } else {
+        console.log('Manga already exists:', mangaId);
+      }
+    } else {
+      console.log('User has already favorited manga:', mangaId, 'for user:', userId);
     }
+
     res.json({ message: 'Manga favorited successfully' });
   } catch (error) {
     console.error('Error favoriting manga:', error);
@@ -185,18 +206,34 @@ export const readingManga = async (req, res) => {
   try {
     const userId = req.user._id;
     const mangaId = req.params.mangaId;
-    const mangaData = req.body;
+    const { title, image } = req.body;
+
+    console.log('Adding manga to reading list:', mangaId, 'for user:', userId);
+
     const user = await User.findById(userId);
     if (!user) {
+      console.log('User not found:', userId);
       return res.status(404).json({ message: 'User not found' });
     }
+
     if (!user.readingManga.includes(mangaId)) {
       user.readingManga.push(mangaId);
       await user.save();
 
-       // Save the manga details in the Manga collection
-       await saveMangaDetails(mangaData);
+      console.log('User updated, adding manga to reading list:', mangaId, 'for user:', userId);
+
+      const existingManga = await Manga.findOne({ id: mangaId });
+
+      if (!existingManga) {
+        console.log('Manga does not exist, creating new entry:', mangaId);
+        await createBareManga(mangaId, title.english || title.romaji || title.native, image);
+      } else {
+        console.log('Manga already exists:', mangaId);
+      }
+    } else {
+      console.log('Manga is already in the reading list:', mangaId, 'for user:', userId);
     }
+
     res.json({ message: 'Manga added to reading list' });
   } catch (error) {
     console.error('Error marking manga as reading:', error);
@@ -284,6 +321,7 @@ export const submitProfileComment = async (req, res) => {
   }
 };
 
+
 export const getUserManga = async (req, res) => {
   try {
     const userId = req.params._id;
@@ -292,14 +330,31 @@ export const getUserManga = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const followedManga = await Manga.find({ _id: { $in: user.followedManga } });
-    const favoriteManga = await Manga.find({ _id: { $in: user.favoriteManga } });
-    const readingManga = await Manga.find({ _id: { $in: user.readingManga } });
+    const followedMangaDetails = await Promise.all(
+      user.followedManga.map(async (mangaId) => {
+        const manga = await Manga.findOne({ id: mangaId });
+        return manga;
+      })
+    );
+
+    const favoriteMangaDetails = await Promise.all(
+      user.favoriteManga.map(async (mangaId) => {
+        const manga = await Manga.findOne({ id: mangaId });
+        return manga;
+      })
+    );
+
+    const readingMangaDetails = await Promise.all(
+      user.readingManga.map(async (mangaId) => {
+        const manga = await Manga.findOne({ id: mangaId });
+        return manga;
+      })
+    );
 
     res.json({
-      followedManga,
-      favoriteManga,
-      readingManga,
+      followedManga: followedMangaDetails,
+      favoriteManga: favoriteMangaDetails,
+      readingManga: readingMangaDetails,
     });
   } catch (error) {
     console.error('Error fetching user manga:', error);

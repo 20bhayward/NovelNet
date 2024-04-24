@@ -47,6 +47,7 @@ const Header: React.FC = () => {
           </Link>
         </Box>
         <Spacer flex="1" />
+        {isAuthenticated ? (
         <Box flex="55">  
           <Button flex="1" variant="ghost" onClick={handleHome} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
             Home
@@ -54,7 +55,11 @@ const Header: React.FC = () => {
           <Button flex="1" variant="ghost" onClick={handleAnnouncements} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
             Announcements
           </Button>
-        </Box>
+        </Box>) : (<Box flex="55">  
+          <Button flex="1" variant="ghost" onClick={handleHome} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
+            Home
+          </Button>
+        </Box>)}
         <Spacer flex="1" />
         <Flex align="center">
           <SearchBar />
