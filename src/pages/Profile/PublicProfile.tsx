@@ -112,7 +112,7 @@ const PublicProfile: React.FC = () => {
   return (
     <Box bg="background" minHeight="100vh" py={8}>
       <Grid templateColumns={['1fr', '1fr', '1fr 2fr']} gap={8} maxW="1200px" mx="auto">
-        <Box bg="subbackground" p={6} borderRadius="md" boxShadow="md">
+        <Box bg="subbackground" p={6} borderRadius="md" boxShadow="md" height="97%" mt={0}>
           <Box display="flex" justifyContent="center" alignItems="center">
             <Avatar
               size="2xl"
@@ -121,14 +121,14 @@ const PublicProfile: React.FC = () => {
               mb={4}
             />
           </Box>
-          <Heading as="h2" size="xl" color="white" textAlign="center" mb={2}>
+          <Heading as="h2" size="xl" color="white" textAlign="center" mb={4}>
             {profile.username}
           </Heading>
           <Divider my={4} />
-          <Text fontSize="xl" textAlign="center" color="white" mb={2}>
+          <Text fontSize="xl" textAlign="center" color="white" mb={4}>
             {profile.firstName} {profile.lastName}
           </Text>
-          <Text fontSize="lg" textAlign="center" color="white" mb={2}>
+          <Text fontSize="lg" textAlign="center" color="white" mb={4}>
             {profile.gender}
           </Text>
           <Text fontSize="lg" textAlign="center" color="white">

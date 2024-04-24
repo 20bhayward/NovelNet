@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import axios from 'axios';
 import { FaStar, FaHeart, FaEye, FaArrowLeft, FaRegHeart, FaBook, FaRegBookmark, FaBookmark } from 'react-icons/fa';
@@ -111,6 +111,7 @@ const MangaDetails: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const location = useLocation();
     const { isAuthenticated, user } = useContext(AuthContext);
     const [isFollowing, setIsFollowing] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
@@ -137,6 +138,10 @@ const MangaDetails: React.FC = () => {
         'Sports': '#16a085',
         'Supernatural': '#d35400',
         'Thriller': '#c0392b'
+    };
+
+    const handleReturnToSearch = () => {
+        navigate(-1);
     };
 
     useEffect(() => {
@@ -491,12 +496,12 @@ const MangaDetails: React.FC = () => {
                 </Button>
             </Box>
             <Box mt={12} textAlign="center">
-                <Link to="/search">
-                    <Flex align="center" justify="center" color="white">
+                <Box onClick={handleReturnToSearch} cursor="pointer" color="white">
+                    <Flex align="center" justify="center">
                         <FaArrowLeft />
-                        <Text ml={2} mt={3}>Back to Search</Text>
+                        <Text ml={2} mt={4}>Return</Text>
                     </Flex>
-                </Link>
+                </Box>
             </Box>
         </Box>
     );

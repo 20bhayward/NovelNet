@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Flex, Icon, Grid, GridItem, Text, Image } from '@chakra-ui/react';
+import { Box, Flex, Icon, Text, Image } from '@chakra-ui/react';
 import { FaChevronLeft, FaChevronRight, FaCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -20,19 +20,23 @@ interface MangaCarouselProps {
 
 const MangaCarousel: React.FC<MangaCarouselProps> = ({ manga }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const itemsPerPage = 5;
+  const [direction, setDirection] = useState<'left' | 'right'>('right');
+  const itemsPerPage = 3;
   const totalPages = Math.ceil(manga.length / itemsPerPage);
 
   const handlePrev = () => {
     setActiveIndex((prevIndex) => (prevIndex === 0 ? totalPages - 1 : prevIndex - 1));
+    setDirection('left');
   };
 
   const handleNext = () => {
     setActiveIndex((prevIndex) => (prevIndex === totalPages - 1 ? 0 : prevIndex + 1));
+    setDirection('right');
   };
 
   const handleCarouselSelect = (selectedIndex: number) => {
     setActiveIndex(selectedIndex);
+    setDirection(selectedIndex > activeIndex ? 'right' : 'left');
   };
 
   const variants = {
@@ -56,29 +60,34 @@ const MangaCarousel: React.FC<MangaCarouselProps> = ({ manga }) => {
     const mangaToDisplay = manga.slice(startIndex, endIndex);
 
     return (
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={`carousel-page-${activeIndex}`}
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '-100%' }}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
           transition={{ duration: 0.5 }}
           style={{
-            display: 'grid',
-            gridTemplateColumns: ['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)'].join(' '),
+            display: 'flex',
             gap: '1rem',
+            width: '100%',
+            justifyContent: 'center',
+            height: '300px',
           }}
         >
           {mangaToDisplay.map((item) => (
             <motion.div
               key={item._id}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, zIndex: 1 }}
               transition={{ duration: 0.2 }}
               style={{
                 borderRadius: '0.5rem',
                 overflow: 'hidden',
                 boxShadow: 'md',
-                height: '400px',
+                maxWidth: '200px',
+                position: 'relative',
               }}
             >
               <Box
@@ -87,10 +96,29 @@ const MangaCarousel: React.FC<MangaCarouselProps> = ({ manga }) => {
                 cursor="pointer"
                 as={Link}
                 to={`/manga/${item.id}`}
+                position="relative"
+                borderRadius="0.5rem"
+                overflow="hidden"
               >
-                <Image src={item.image} alt={item.title} objectFit="cover" height="200px" />
-                <Box p={2}>
-                  <Text fontWeight="bold" fontSize="sm" color="white" noOfLines={2}>
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  objectFit="cover"
+                  height="100%"
+                  width="100%"
+                  borderRadius="0.5rem"
+                />
+                <Box
+                  position="absolute"
+                  bottom={0}
+                  left={0}
+                  width="100%"
+                  backgroundColor="rgba(0, 0, 0, 0.6)"
+                  py={2}
+                  px={4}
+                  borderBottomRadius="0.5rem"
+                >
+                  <Text fontWeight="bold" fontSize="md" color="white" noOfLines={2} textAlign="center">
                     {item.title}
                   </Text>
                 </Box>
@@ -103,30 +131,26 @@ const MangaCarousel: React.FC<MangaCarouselProps> = ({ manga }) => {
   };
 
   return (
-    <Box bg="background"  p={6} borderRadius="md" boxShadow="md">
+    <Box bg="subbackground" p={6} ml={-4} borderRadius="md" boxShadow="md" position="relative">
+      <Box position="relative" overflow="hidden" width="100%" height="300px">
+        {manga.length > 0 && renderMangaList()}
+      </Box>
       {manga.length > 0 && (
-        <>
-          {renderMangaList()}
-          <Flex mt={4} justifyContent="center" alignItems="center">
-            {totalPages > 1 && (
-              <>
-                <Icon as={FaChevronLeft} mr={2} color="section" cursor="pointer" onClick={handlePrev} />
-                {Array.from({ length: totalPages }).map((_, index) => (
-                  <Icon
-                    key={index}
-                    as={FaCircle}
-                    color={index === activeIndex ? 'button' : 'subbackground'}
-                    mx={totalPages === 1 ? 0 : 2}
-                    cursor="pointer"
-                    onClick={() => handleCarouselSelect(index)}
-                    boxSize={3}
-                  />
-                ))}
-                <Icon as={FaChevronRight} ml={2} color="section" cursor="pointer" onClick={handleNext} />
-              </>
-            )}
-          </Flex>
-        </>
+        <Flex justifyContent="center" alignItems="center" mt={4}>
+          <Icon as={FaChevronLeft} mr={2} color="section" cursor="pointer" onClick={handlePrev} />
+          {Array.from({ length: totalPages }).map((_, index) => (
+            <Icon
+              key={index}
+              as={FaCircle}
+              color={index === activeIndex ? 'section' : 'button'}
+              mx={2}
+              cursor="pointer"
+              onClick={() => handleCarouselSelect(index)}
+              boxSize={3}
+            />
+          ))}
+          <Icon as={FaChevronRight} ml={2} color="section" cursor="pointer" onClick={handleNext} />
+        </Flex>
       )}
     </Box>
   );
