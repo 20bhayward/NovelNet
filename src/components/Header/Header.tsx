@@ -9,10 +9,6 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleAdvancedSearch = () => {
-    navigate('/advanced-search');
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -37,7 +33,7 @@ const Header: React.FC = () => {
 
   return (
     <Box bg="header" py={2}>
-      
+
       <Flex align="center" maxW="1600px" mx="auto">
         <Box bg="header" flex="1" borderRadius="md" _hover={{ bg: 'whiteAlpha.200' }} py={2} px={4}>
           <Link to="/">
@@ -48,18 +44,18 @@ const Header: React.FC = () => {
         </Box>
         <Spacer flex="1" />
         {isAuthenticated ? (
-        <Box flex="55">  
-          <Button flex="1" variant="ghost" onClick={handleHome} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
-            Home
-          </Button>
-          <Button flex="1" variant="ghost" onClick={handleAnnouncements} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
-            Announcements
-          </Button>
-        </Box>) : (<Box flex="55">  
-          <Button flex="1" variant="ghost" onClick={handleHome} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
-            Home
-          </Button>
-        </Box>)}
+          <Box flex="55">
+            <Button flex="1" variant="ghost" onClick={handleHome} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
+              Home
+            </Button>
+            <Button flex="1" variant="ghost" onClick={handleAnnouncements} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
+              Announcements
+            </Button>
+          </Box>) : (<Box flex="55">
+            <Button flex="1" variant="ghost" onClick={handleHome} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
+              Home
+            </Button>
+          </Box>)}
         <Spacer flex="1" />
         <Flex align="center">
           <SearchBar />

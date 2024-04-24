@@ -1,4 +1,3 @@
-// models/Announcement.js
 import mongoose from 'mongoose';
 
 const announcementSchema = new mongoose.Schema({

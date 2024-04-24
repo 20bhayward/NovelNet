@@ -34,21 +34,33 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
     onSort(e.target.value);
   };
 
+
   const handleTagsChange = (tag: string) => {
     if (tags.includes(tag)) {
       // Tag already exists, remove it
       setTags(tags.filter((t) => t !== tag));
     } else if (tags.includes(`!${tag}`)) {
-      // Negated tag exists, replace it with the positive tag
-      setTags(tags.filter((t) => t !== `!${tag}`).concat(tag));
+      // Negated tag exists, replace it with the optional tag
+      setTags(tags.filter((t) => t !== `!${tag}`).concat(`?${tag}`));
     } else if (tags.includes(`?${tag}`)) {
-      // Optional tag exists, replace it with the negated tag
-      setTags(tags.filter((t) => t !== `?${tag}`).concat(`!${tag}`));
+      // Optional tag exists, remove it
+      setTags(tags.filter((t) => t !== `?${tag}`));
     } else {
-      // Add the optional tag
-      setTags([...tags, `?${tag}`]);
+      // Add the required tag
+      setTags([...tags, tag]);
     }
     onFilters({ ...filters, tags });
+  };
+
+  const getTagSymbol = (tag: string) => {
+    if (tags.includes(`!${tag}`)) {
+      return '✕'; // Excluded tag
+    } else if (tags.includes(`?${tag}`)) {
+      return '?'; // Optional tag
+    } else if (tags.includes(tag)) {
+      return '✓'; // Required tag
+    }
+    return ''; // No symbol
   };
 
   const handleMinRatingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,17 +106,16 @@ const SearchSidebar: React.FC<SearchSidebarProps> = ({
       </Form.Group>
 
       <Form.Group controlId="tagsFilter">
-        <Form.Label style={{color: "white"}}>Tags</Form.Label>
+        <Form.Label style={{ color: "white" }}>Tags</Form.Label>
         {['Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mahou Shoujo', 'Mecha', 'Music', 'Mystery', 'Psychological', 'Romance', 'Sci-Fi', 'Slice of Life', 'Sports', 'Supernatural', 'Thriller'].map((tag) => (
-          <Form.Check
-            style={{ color: "white" }}
+          <Button
             key={tag}
-            type="checkbox"
-            label={tag}
-            value={tag.toLowerCase()}
-            checked={tags.includes(tag.toLowerCase()) || tags.includes(`!${tag.toLowerCase()}`)}
-            onChange={() => handleTagsChange(tag.toLowerCase())}
-          />
+            variant={tags.includes(tag.toLowerCase()) ? 'primary' : tags.includes(`!${tag.toLowerCase()}`) ? 'danger' : tags.includes(`?${tag.toLowerCase()}`) ? 'warning' : 'secondary'}
+            onClick={() => handleTagsChange(tag.toLowerCase())}
+            style={{ marginRight: '5px', marginBottom: '5px' }}
+          >
+            {getTagSymbol(tag.toLowerCase())} {tag}
+          </Button>
         ))}
       </Form.Group>
 

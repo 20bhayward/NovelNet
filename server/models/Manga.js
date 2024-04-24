@@ -1,4 +1,3 @@
-// Manga.js
 import mongoose from 'mongoose';
 
 const mangaSchema = new mongoose.Schema({
