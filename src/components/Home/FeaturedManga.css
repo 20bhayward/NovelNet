@@ -12,14 +12,14 @@
   }
   
   .featured-manga-carousel {
-    background-color: #222; /* Adjust the background color as needed */
+    background-color: #222;
     border-radius: 0.5rem;
     overflow: hidden;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   }
   
   .featured-manga-item {
-    height: 500px; /* Adjust the height as needed */
+    height: 500px;
   }
   
   .featured-manga-link {

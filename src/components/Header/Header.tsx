@@ -51,9 +51,6 @@ const Header: React.FC = () => {
           <Button flex="1" variant="ghost" onClick={handleHome} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
             Home
           </Button>
-          <Button flex="1" variant="ghost" onClick={handleAdvancedSearch} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
-            Advanced Search
-          </Button>
           <Button flex="1" variant="ghost" onClick={handleAnnouncements} color="white" _hover={{ bg: 'whiteAlpha.200' }} mr={4}>
             Announcements
           </Button>

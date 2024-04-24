@@ -13,6 +13,7 @@ import MangaDetails from './pages/Details/MangaDetails';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import theme from './theme';
 import AnnouncementsPage from './pages/Announcements/AnnouncementsPage';
+import { MangaProvider } from './contexts/MangaContext';
 
 function App() {
   return (

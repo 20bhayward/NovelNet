@@ -224,61 +224,60 @@ const MangaDetails: React.FC = () => {
             navigate('/default-profile');
         }
     }
-
-    const handleFollow = async () => {
-        if (user && user._id) {
+   const handleFollow = async () => {
+        if (user && user._id && mangaDetails) {
             try {
                 if (isFollowing) {
                     await api.post(`/api/users/${user._id}/unfollow/${mangaId}`);
                     setIsFollowing(false);
                 } else {
-                    await api.post(`/api/users/${user._id}/follow/${mangaId}`);
+                    await api.post(`/api/users/${user._id}/follow/${mangaId}`, mangaDetails);
                     setIsFollowing(true);
                 }
             } catch (error) {
                 console.error('Error toggling follow:', error);
             }
         } else {
-            console.error('User not authenticated or user ID not available');
+            console.error('User not authenticated, user ID not available, or manga details not loaded');
         }
     };
 
     const handleFavorite = async () => {
-        if (user && user._id) {
+        if (user && user._id && mangaDetails) {
             try {
                 if (isFavorite) {
                     await api.post(`/api/users/${user._id}/unfavorite/${mangaId}`);
                     setIsFavorite(false);
                 } else {
-                    await api.post(`/api/users/${user._id}/favorite/${mangaId}`);
+                    await api.post(`/api/users/${user._id}/favorite/${mangaId}`, mangaDetails);
                     setIsFavorite(true);
                 }
             } catch (error) {
                 console.error('Error toggling favorite:', error);
             }
         } else {
-            console.error('User not authenticated or user ID not available');
+            console.error('User not authenticated, user ID not available, or manga details not loaded');
         }
     };
 
     const handleReading = async () => {
-        if (user && user._id) {
+        if (user && user._id && mangaDetails) {
             try {
                 if (isReading) {
                     await api.post(`/api/users/${user._id}/unreading/${mangaId}`);
                     setIsReading(false);
                 } else {
-                    await api.post(`/api/users/${user._id}/reading/${mangaId}`);
+                    await api.post(`/api/users/${user._id}/reading/${mangaId}`, mangaDetails);
                     setIsReading(true);
                 }
             } catch (error) {
                 console.error('Error toggling reading:', error);
             }
         } else {
-            console.error('User not authenticated or user ID not available');
+            console.error('User not authenticated, user ID not available, or manga details not loaded');
         }
     };
-
+    
     if (isLoading) {
         return (
             <Box bg="background" minH="100vh" display="flex" justifyContent="center" alignItems="center">

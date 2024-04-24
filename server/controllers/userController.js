@@ -260,15 +260,18 @@ export const getUserManga = async (req, res) => {
   try {
     const userId = req.params._id;
     const user = await User.findById(userId).populate('followedManga favoriteManga readingManga');
-
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const followedManga = await Manga.find({ _id: { $in: user.followedManga } });
+    const favoriteManga = await Manga.find({ _id: { $in: user.favoriteManga } });
+    const readingManga = await Manga.find({ _id: { $in: user.readingManga } });
+
     res.json({
-      followedManga: user.followedManga,
-      favoriteManga: user.favoriteManga,
-      readingManga: user.readingManga,
+      followedManga,
+      favoriteManga,
+      readingManga,
     });
   } catch (error) {
     console.error('Error fetching user manga:', error);

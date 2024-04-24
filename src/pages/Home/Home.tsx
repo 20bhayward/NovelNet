@@ -48,19 +48,17 @@ const Home: React.FC = () => {
 
     const fetchUserManga = async () => {
       try {
-        if (isAuthenticated && user) {
-          const response = await api.get(`/api/users/${user._id}/manga`, { withCredentials: true });
-          const { followedManga, favoriteManga, readingManga } = response.data;
-          await Promise.all([
-            fetchMangaDetails(followedManga, setFollowedManga),
-            fetchMangaDetails(favoriteManga, setFavoriteManga),
-            fetchMangaDetails(readingManga, setReadingManga),
-          ]);
-        }
+          if (isAuthenticated && user) {
+              const response = await api.get(`/api/users/${user._id}/manga`, { withCredentials: true });
+              const { followedManga, favoriteManga, readingManga } = response.data;
+              setFollowedManga(followedManga);
+              setFavoriteManga(favoriteManga);
+              setReadingManga(readingManga);
+          }
       } catch (error) {
-        console.error('Error fetching user manga:', error);
+          console.error('Error fetching user manga:', error);
       }
-    };
+  };
 
     fetchUserManga();
   }, [isAuthenticated, user]);

@@ -28,20 +28,20 @@ const AnnouncementsPanel: React.FC = () => {
   }, []);
 
   return (
-    <Box bg="section" p={4} borderRadius="md" boxShadow="md" border="true" borderWidth={7} borderColor="subbackground">
+    <Box bg="section" p={4} height='535px' borderRadius="md" boxShadow="md" border="true" borderWidth={7} borderColor="subbackground" >
       <Heading as="h2" size="xl" mb={4} color="heading">
         Announcements
       </Heading>
-      {announcements.map((announcement) => (
-        <Box key={announcement._id} mb={4} color="subbackground">
+      {announcements.slice(0, 2).map((announcement) => (
+        <Box key={announcement._id} mb={4} bg="subbackground" borderRadius="md" boxShadow="lg" border="true" borderWidth={7} p={4} borderColor="section" color="section" >
           <Text fontWeight="bold" color="heading">
             {announcement.title}
           </Text>
-          <Text color="subheading" mt={-2}>
+          <Text color="subheading" mt={-4}>
             {new Date(announcement.createdAt).toLocaleString()}
           </Text>
           {announcement.content.length > 100 ? (
-            <Link as={RouterLink} to={`/announcements/${announcement._id}`} color="blue.400">
+            <Link as={RouterLink} to={`/announcements`} color="blue.400">
               Read more
             </Link>
           ) : (
@@ -50,9 +50,9 @@ const AnnouncementsPanel: React.FC = () => {
         </Box>
       ))}
       <Spacer mt={50} />
-      <Link as={RouterLink} to="/announcements" color="blue.400">
+      <Box as={RouterLink} to="/announcements"  bg="subbackground" borderRadius="lg" boxShadow="lg" border="true" borderWidth={7} p={4} borderColor="section"color="blue.400" >
         View all announcements
-      </Link>
+      </Box>
     </Box>
   );
 };
