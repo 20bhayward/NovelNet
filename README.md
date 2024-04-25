@@ -1,3 +1,9 @@
-<h1>Design</h1>
+# Lore Library
+Lore Library is a website I made with the goal of hosting a platform for finding and review reading content like manga, webnovels, etc. Right now we have the manga functionality done!
 
-![Final Website Project UML Diagram](https://github.com/20bhayward/NovelNet/assets/50412055/b6407075-ed77-40ee-9863-74cdfa12a3d8)
+## Features
+- Browse and search for manga titles
+- View detailed information about each manga, including synopsis, genres, and ratings
+- User authentication and profiles
+- Follow, favorite, and mark manga as reading
+- Leave reviews and comments on manga titles
